@@ -378,6 +378,8 @@ public class BluetoothLePlugin extends CordovaPlugin {
       isInitializedAction(callbackContext);
     } else if ("isEnabled".equals(action)) {
       isEnabledAction(callbackContext);
+    } else if ("requestEnable".equals(action)) {
+      requestEnableAction();
     } else if ("isScanning".equals(action)) {
       isScanningAction(callbackContext);
     } else if ("wasConnected".equals(action)) {
@@ -1651,7 +1653,7 @@ public class BluetoothLePlugin extends CordovaPlugin {
         boolean bool = ((Boolean) localMethod.invoke(localBluetoothGatt, new Object[0])).booleanValue();
         return bool;
       }
-    } 
+    }
     catch (Exception localException) {
       Log.e("BLE", "An exception occured while refreshing device cache");
     }
@@ -2450,6 +2452,13 @@ public class BluetoothLePlugin extends CordovaPlugin {
     addProperty(returnObj, keyIsEnabled, result);
 
     callbackContext.success(returnObj);
+  }
+
+  private void requestEnableAction() {
+    if(bluetoothAdapter != null && !bluetoothAdapter.isEnabled()){
+      Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+      cordova.startActivityForResult(this, enableBtIntent, REQUEST_BT_ENABLE);
+    }
   }
 
   private void isScanningAction(CallbackContext callbackContext) {
