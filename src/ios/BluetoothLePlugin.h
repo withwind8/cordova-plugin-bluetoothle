@@ -45,6 +45,7 @@
 - (void)requestConnectionPriority:(CDVInvokedUrlCommand *)command;
 - (void)isInitialized:(CDVInvokedUrlCommand *)command;
 - (void)isEnabled:(CDVInvokedUrlCommand *)command;
+- (void)requestEnable:(CDVInvokedUrlCommand *)command;
 - (void)isScanning:(CDVInvokedUrlCommand *)command;
 - (void)isBonded:(CDVInvokedUrlCommand *)command;
 - (void)wasConnected:(CDVInvokedUrlCommand *)command;

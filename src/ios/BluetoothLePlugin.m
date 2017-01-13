@@ -1827,6 +1827,40 @@ NSString *const operationWrite = @"write";
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
+#define IOS10_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] >= 10.0)
+
+- (void)requestEnable:(CDVInvokedUrlCommand *)command {
+  NSLog(@"request enable in ios");
+  if(centralManager != nil && centralManager.state == CBCentralManagerStatePoweredOff){
+    if(IOS10_OR_LATER){
+      NSLog(@">=ios10 request");
+      centralManager = nil;
+      centralManager.delegate = nil;
+
+      NSNumber* request = [NSNumber numberWithBool:YES];
+      NSMutableDictionary* options = [NSMutableDictionary dictionary];
+      [options setValue:request forKey:CBCentralManagerOptionShowPowerAlertKey];
+      centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil options:options];
+    }else{
+      NSLog(@"<ios10 request");
+      UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:@"打开蓝牙来允许“SmartSwitch”连接到配件" preferredStyle:UIAlertControllerStyleAlert];
+      UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"设置" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+          NSLog(@"设置");
+          NSURL *url = [NSURL URLWithString:@"prefs:root=Bluetooth"];
+          if ([[UIApplication sharedApplication] canOpenURL:url]) {
+              [[UIApplication sharedApplication] openURL:url];
+          }
+      }];
+      UIAlertAction *otherAction = [UIAlertAction actionWithTitle:@"好" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+          NSLog(@"好");
+      }];
+      [alertController addAction:cancelAction];
+      [alertController addAction:otherAction];
+      [self.viewController presentViewController:alertController animated:YES completion:nil];
+    }
+  }
+}
+
 - (void)isScanning:(CDVInvokedUrlCommand *)command {
   //See if Bluetooth is scanning
   NSNumber* result = [NSNumber numberWithBool:(scanCallback != nil)];
